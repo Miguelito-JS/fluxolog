@@ -58,8 +58,10 @@ def test_migra_banco_da_versao_anterior(caminho_banco):
 
 def test_api_cria_e_filtra_por_prioridade(cliente):
     cliente.post("/api/tarefas", json={"titulo": "Normal"})
-    resposta = cliente.post("/api/tarefas", json={"titulo": "Pane no caminhão",
-                                                   "prioridade": "critica"})
+    resposta = cliente.post(
+        "/api/tarefas", json={"titulo": "Pane no caminhão", "prioridade": "critica"}
+    )
+    assert resposta.status_code == 201
     assert resposta.status_code == 201
     criticas = cliente.get("/api/tarefas?prioridade=critica").get_json()
     assert [t["titulo"] for t in criticas] == ["Pane no caminhão"]
