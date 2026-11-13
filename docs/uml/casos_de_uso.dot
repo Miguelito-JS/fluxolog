@@ -1,0 +1,41 @@
+// Diagrama de Casos de Uso do FluxoLog (posições fixas; gerar com: neato -Tpng casos_de_uso.dot)
+graph CasosDeUso {
+  graph [fontname="DejaVu Sans", label="Diagrama de Casos de Uso — FluxoLog", labelloc=t, fontsize=18, overlap=true, splines=line, pad=0.3];
+  node  [fontname="DejaVu Sans", fontsize=11];
+  edge  [fontname="DejaVu Sans", fontsize=9, color="#334155"];
+
+  // Fronteira do sistema (desenhada primeiro, fica no fundo)
+  fronteira [shape=box, style="rounded", color="#1d4ed8", penwidth=1.6, label="Sistema FluxoLog", labelloc=t, fontsize=13, pos="5.7,4.6!", width=6.4, height=7.8, fixedsize=true];
+
+  // Atores
+  gestor   [shape=none, image="ator.png", label="Gestor da equipe", labelloc=b, imagepos=tc, height=1.25, width=1.5, fixedsize=true, pos="0.9,7.2!"];
+  operador [shape=none, image="ator.png", label="Colaborador\nda operação", labelloc=b, imagepos=tc, height=1.45, width=1.5, fixedsize=true, pos="0.9,3.8!"];
+  sistema  [shape=box, style="rounded", label="«ator»\nSistema externo\n(via API REST)", color="#334155", pos="10.3,2.0!"];
+
+  // Casos de uso
+  node [shape=ellipse, style=filled, fillcolor="#eef2ff", color="#1d4ed8", fixedsize=true, width=2.2, height=0.75];
+  excluir   [label="Excluir tarefa",               pos="4.0,7.6!"];
+  ver       [label="Visualizar quadro\nKanban",    pos="4.0,6.2!"];
+  criar     [label="Criar tarefa",                 pos="4.0,5.0!"];
+  editar    [label="Editar tarefa",                pos="4.0,3.8!"];
+  mover     [label="Mover tarefa\nentre colunas",  pos="4.0,2.6!"];
+  filtrar   [label="Filtrar tarefas\n(status / prioridade)", pos="4.0,1.4!", width=2.5];
+  priorizar [label="Definir prioridade\n(mudança de escopo v0.2)", pos="7.4,6.6!", width=2.8, fillcolor="#fee2e2", color="#b91c1c"];
+  validar   [label="Validar dados\nda tarefa",     pos="7.4,4.15!"];
+
+  // Associações ator — caso de uso
+  gestor -- excluir;
+  gestor -- priorizar;
+  operador -- {ver criar editar mover filtrar};
+  sistema -- {criar filtrar};
+
+  // Generalização: o gestor herda tudo o que o colaborador faz
+  gestor -- operador [dir=forward, arrowhead=empty, label="  herda", headclip=true];
+
+  // Relações entre casos de uso
+  edge [style=dashed, dir=forward, arrowhead=vee];
+  criar  -- validar [label="«include»"];
+  editar -- validar [label="«include»"];
+  priorizar -- criar [label="«extend»"];
+  mover -- editar [label="  «extend»"];
+}

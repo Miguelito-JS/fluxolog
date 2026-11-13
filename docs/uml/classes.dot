@@ -1,0 +1,74 @@
+digraph Classes {
+  graph [rankdir=TB, fontname="DejaVu Sans", nodesep=0.6, ranksep=0.7, pad=0.3, label="Diagrama de Classes — FluxoLog", labelloc=t, fontsize=18];
+  node  [shape=plain, fontname="DejaVu Sans", fontsize=10];
+  edge  [fontname="DejaVu Sans", fontsize=9, color="#334155"];
+
+  Tarefa [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#eef2ff" color="#1d4ed8">
+   <tr><td><i>«dataclass»</i><br/><b>Tarefa</b></td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">+ id: int | None<br/>+ titulo: str<br/>+ descricao: str = ""<br/>+ status: str = "a_fazer"<br/><font color="#b91c1c">+ prioridade: str = "media"</font><br/>+ criada_em: str</td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">+ validar(): None<br/>+ para_dict(): dict</td></tr>
+  </table>>];
+
+  ErroValidacao [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#fff7ed" color="#9a3412">
+   <tr><td><b>ErroValidacao</b></td></tr>
+   <tr><td sides="t" border="1"> </td></tr>
+  </table>>];
+
+  ValueError [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#f1f5f9" color="#64748b">
+   <tr><td><i>«built-in Python»</i><br/><b>ValueError</b></td></tr>
+  </table>>];
+
+  Status [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#f0fdf4" color="#15803d">
+   <tr><td><i>«enumeration»</i><br/><b>Status</b></td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">a_fazer<br/>em_progresso<br/>concluido</td></tr>
+  </table>>];
+
+  Prioridade [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#fef2f2" color="#b91c1c">
+   <tr><td><i>«enumeration» (v0.2)</i><br/><b>Prioridade</b></td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">critica<br/>alta<br/>media<br/>baixa</td></tr>
+  </table>>];
+
+  Repositorio [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#ffffff" color="#1f2933">
+   <tr><td><b>RepositorioTarefas</b></td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">+ caminho_banco: str</td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">+ criar(tarefa: Tarefa): Tarefa<br/>+ listar(status, prioridade): list[Tarefa]<br/>+ buscar(tarefa_id: int): Tarefa | None<br/>+ atualizar(tarefa_id: int, **campos): Tarefa | None<br/>+ remover(tarefa_id: int): bool<br/>- _criar_tabela(): None<br/><font color="#b91c1c">- _migrar(): None</font></td></tr>
+  </table>>];
+
+  Api [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#ffffff" color="#1f2933">
+   <tr><td><i>«blueprint»</i><br/><b>api</b> (/api/tarefas)</td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">+ listar_tarefas()<br/>+ criar_tarefa()<br/>+ buscar_tarefa(id)<br/>+ atualizar_tarefa(id)<br/>+ remover_tarefa(id)</td></tr>
+  </table>>];
+
+  Web [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#ffffff" color="#1f2933">
+   <tr><td><i>«blueprint»</i><br/><b>web</b> (páginas HTML)</td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">+ quadro()<br/>+ criar()<br/>+ mover(id)<br/>+ editar(id)<br/>+ excluir(id)</td></tr>
+  </table>>];
+
+  App [label=<
+  <table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#f8fafc" color="#1f2933">
+   <tr><td><i>«app factory»</i><br/><b>criar_app()</b></td></tr>
+   <tr><td align="left" balign="left" sides="t" border="1">cria o Flask, o repositório<br/>e registra os blueprints</td></tr>
+  </table>>];
+
+  {rank=same; Api; Web}
+  {rank=same; Status; Tarefa; Prioridade}
+
+  App -> Api [arrowhead=diamond, dir=back, arrowtail=diamond, label=" registra"];
+  App -> Web [dir=back, arrowtail=diamond, label=" registra"];
+  App -> Repositorio [dir=back, arrowtail=diamond, label=" 1  cria"];
+  Api -> Repositorio [arrowhead=vee, style=dashed, label=" usa"];
+  Web -> Repositorio [arrowhead=vee, style=dashed, label=" usa"];
+  Repositorio -> Tarefa [arrowhead=vee, label=" gerencia\n 0..*"];
+  Tarefa -> Status [arrowhead=vee, style=dashed, label=" usa"];
+  Tarefa -> Prioridade [arrowhead=vee, style=dashed, label=" usa"];
+  Tarefa -> ErroValidacao [arrowhead=vee, style=dashed, label=" «lança»"];
+  ErroValidacao -> ValueError [arrowhead=empty, label=" herda"];
+}
