@@ -160,4 +160,4 @@ necessidade não estava no escopo inicial. A mudança foi aceita porque:
 
 ## Autor
 
-**Lucas Saraiva Oliveira** — Análise e Desenvolvimento de Sistemas, UniFECAF.
+**Miguel de Jesus Santos** — Análise e Desenvolvimento de Sistemas, UniFECAF.
