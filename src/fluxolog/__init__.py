@@ -27,6 +27,8 @@ def criar_app(configuracao: dict | None = None) -> Flask:
     app.extensions["repositorio"] = RepositorioTarefas(app.config["DATABASE"])
 
     from .api import api_bp
+    from .web import web_bp
 
     app.register_blueprint(api_bp)
+    app.register_blueprint(web_bp)
     return app

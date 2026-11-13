@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block titulo %}FluxoLog{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body>
+  <header class="topo">
+    <a href="{{ url_for('web.quadro') }}" class="marca">FluxoLog</a>
+    <span class="subtitulo">Gerenciador de tarefas da operação</span>
+  </header>
+
+  <main class="conteudo">
+    {# Mensagens de aviso enviadas com flash() nas rotas #}
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+      {% for categoria, mensagem in mensagens %}
+        <p class="aviso aviso-{{ categoria }}">{{ mensagem }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>

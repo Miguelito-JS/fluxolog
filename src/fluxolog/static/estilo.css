@@ -1,0 +1,114 @@
+/* Estilo do FluxoLog — simples, legível e sem dependências externas */
+:root {
+  --fundo: #f4f5f7;
+  --cartao: #ffffff;
+  --texto: #1f2933;
+  --suave: #616e7c;
+  --primaria: #1d4ed8;
+  --perigo: #b91c1c;
+  --borda: #d9dee4;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+.topo {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: var(--texto);
+  color: #fff;
+}
+.marca { color: #fff; font-size: 1.4rem; font-weight: 700; text-decoration: none; }
+.subtitulo { color: #cbd2d9; font-size: .9rem; }
+
+.conteudo { padding: 1.5rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+h2 { font-size: 1.05rem; margin: 0 0 .75rem; }
+h3 { font-size: 1rem; margin: 0 0 .35rem; }
+
+/* Formulários */
+input, textarea, select, button {
+  font: inherit;
+  padding: .5rem .65rem;
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+}
+button {
+  background: var(--primaria);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.formulario-linha { display: flex; gap: .5rem; flex-wrap: wrap; }
+.formulario-linha input[name="titulo"] { flex: 1 1 220px; }
+.formulario-linha input[name="descricao"] { flex: 2 1 300px; }
+.formulario-coluna { display: grid; gap: .9rem; max-width: 520px; }
+.formulario-coluna label { display: grid; gap: .3rem; font-weight: 600; }
+
+.nova-tarefa { margin-bottom: 1.5rem; }
+
+/* Quadro Kanban */
+.quadro {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.coluna {
+  background: #e9ecf0;
+  border-radius: 10px;
+  padding: .9rem;
+  border-top: 4px solid var(--suave);
+}
+.coluna-em_progresso { border-top-color: #d97706; }
+.coluna-concluido { border-top-color: #15803d; }
+
+.contador {
+  background: #fff;
+  border-radius: 999px;
+  padding: 0 .55rem;
+  font-size: .85rem;
+  color: var(--suave);
+}
+
+.cartao {
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: .75rem;
+  margin-bottom: .6rem;
+}
+.cartao p { margin: 0 0 .5rem; color: var(--suave); font-size: .9rem; }
+
+.acoes { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+.acoes form { margin: 0; }
+.botao-pequeno {
+  font-size: .78rem;
+  padding: .25rem .5rem;
+  background: #eef2ff;
+  color: var(--primaria);
+  border: 1px solid #c7d2fe;
+  border-radius: 5px;
+  text-decoration: none;
+}
+.botao-pequeno.perigo { background: #fef2f2; color: var(--perigo); border-color: #fecaca; }
+
+.vazio { color: var(--suave); font-size: .9rem; font-style: italic; }
+
+/* Mensagens de aviso */
+.aviso { padding: .6rem .9rem; border-radius: 6px; }
+.aviso-sucesso { background: #dcfce7; color: #14532d; }
+.aviso-erro { background: #fee2e2; color: #7f1d1d; }
+
+/* Em telas pequenas, as colunas ficam uma embaixo da outra */
+@media (max-width: 800px) {
+  .quadro { grid-template-columns: 1fr; }
+}

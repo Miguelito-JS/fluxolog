@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+<section class="nova-tarefa">
+  <h2>Nova tarefa</h2>
+  <form method="post" action="{{ url_for('web.criar') }}" class="formulario-linha">
+    <input name="titulo" placeholder="Título (obrigatório)" maxlength="100" required>
+    <input name="descricao" placeholder="Descrição" maxlength="500">
+    <button type="submit">Adicionar</button>
+  </form>
+</section>
+
+<section class="quadro">
+  {% for status, tarefas in colunas.items() %}
+  <div class="coluna coluna-{{ status }}">
+    <h2>{{ nomes_status[status] }} <span class="contador">{{ tarefas|length }}</span></h2>
+
+    {% for tarefa in tarefas %}
+    <article class="cartao">
+      <h3>{{ tarefa.titulo }}</h3>
+      {% if tarefa.descricao %}<p>{{ tarefa.descricao }}</p>{% endif %}
+
+      <div class="acoes">
+        {# Um botão para cada coluna diferente da atual #}
+        {% for destino in colunas if destino != status %}
+        <form method="post" action="{{ url_for('web.mover', tarefa_id=tarefa.id) }}">
+          <input type="hidden" name="status" value="{{ destino }}">
+          <button type="submit" class="botao-pequeno">→ {{ nomes_status[destino] }}</button>
+        </form>
+        {% endfor %}
+        <a href="{{ url_for('web.editar', tarefa_id=tarefa.id) }}" class="botao-pequeno">Editar</a>
+        <form method="post" action="{{ url_for('web.excluir', tarefa_id=tarefa.id) }}">
+          <button type="submit" class="botao-pequeno perigo">Excluir</button>
+        </form>
+      </div>
+    </article>
+    {% else %}
+    <p class="vazio">Nenhuma tarefa aqui.</p>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}
