@@ -6,6 +6,7 @@ então um teste nunca interfere no outro.
 
 import pytest
 
+from fluxolog import criar_app
 from fluxolog.repositorio import RepositorioTarefas
 
 
@@ -19,3 +20,10 @@ def caminho_banco(tmp_path):
 def repositorio(caminho_banco):
     """Repositório de tarefas apontando para o banco temporário."""
     return RepositorioTarefas(caminho_banco)
+
+
+@pytest.fixture
+def cliente(caminho_banco):
+    """Cliente HTTP de teste do Flask: faz requisições sem subir o servidor."""
+    app = criar_app({"DATABASE": caminho_banco, "TESTING": True})
+    return app.test_client()
