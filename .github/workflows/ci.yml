@@ -1,0 +1,36 @@
+# Pipeline de Integração Contínua (CI) do FluxoLog.
+# Roda automaticamente a cada push e a cada pull request:
+#   1. verifica a qualidade do código com o flake8 (padrão PEP 8 + erros comuns)
+#   2. executa os testes automatizados com o pytest e mede a cobertura
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  qualidade-e-testes:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Testa em duas versões do Python para garantir compatibilidade
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements-dev.txt
+
+      - name: Verificar qualidade do código (flake8)
+        run: flake8 src tests
+
+      - name: Rodar testes automatizados (pytest)
+        run: pytest -v --cov=fluxolog --cov-report=term-missing --cov-fail-under=80
