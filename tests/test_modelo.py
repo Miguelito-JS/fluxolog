@@ -47,4 +47,4 @@ def test_rejeita_status_inexistente():
 
 def test_para_dict_contem_todos_os_campos():
     dados = Tarefa(titulo="Ok").para_dict()
-    assert set(dados) == {"id", "titulo", "descricao", "status", "criada_em"}
+    assert set(dados) == {"id", "titulo", "descricao", "status", "prioridade", "criada_em"}
