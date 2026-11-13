@@ -101,6 +101,23 @@ button {
 }
 .botao-pequeno.perigo { background: #fef2f2; color: var(--perigo); border-color: #fecaca; }
 
+/* Prioridade (mudança de escopo v0.2) */
+.etiqueta {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  padding: .1rem .45rem;
+  border-radius: 4px;
+  margin-bottom: .35rem;
+}
+.etiqueta-critica { background: #fee2e2; color: #991b1b; }
+.etiqueta-alta { background: #ffedd5; color: #9a3412; }
+.etiqueta-media { background: #e0e7ff; color: #3730a3; }
+.etiqueta-baixa { background: #f1f5f9; color: #475569; }
+.cartao.prioridade-critica { border-left: 4px solid #dc2626; }
+
 .vazio { color: var(--suave); font-size: .9rem; font-style: italic; }
 
 /* Mensagens de aviso */

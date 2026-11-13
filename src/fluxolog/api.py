@@ -2,7 +2,7 @@
 
 | Método | Rota                | Ação                          |
 |--------|---------------------|-------------------------------|
-| GET    | /api/tarefas        | lista tarefas (?status=...)   |
+| GET    | /api/tarefas        | lista (?status=&prioridade=)  |
 | POST   | /api/tarefas        | cria uma tarefa               |
 | GET    | /api/tarefas/<id>   | busca uma tarefa              |
 | PUT    | /api/tarefas/<id>   | atualiza uma tarefa           |
@@ -41,7 +41,10 @@ def _tratar_erro_validacao(erro):
 
 @api_bp.get("")
 def listar_tarefas():
-    tarefas = _repositorio().listar(status=request.args.get("status"))
+    tarefas = _repositorio().listar(
+        status=request.args.get("status"),
+        prioridade=request.args.get("prioridade"),
+    )
     return jsonify([t.para_dict() for t in tarefas])
 
 

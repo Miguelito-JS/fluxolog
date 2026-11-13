@@ -6,6 +6,11 @@
   <form method="post" action="{{ url_for('web.criar') }}" class="formulario-linha">
     <input name="titulo" placeholder="Título (obrigatório)" maxlength="100" required>
     <input name="descricao" placeholder="Descrição" maxlength="500">
+    <select name="prioridade" aria-label="Prioridade">
+      {% for valor, nome in nomes_prioridade.items() %}
+      <option value="{{ valor }}" {% if valor == "media" %}selected{% endif %}>{{ nome }}</option>
+      {% endfor %}
+    </select>
     <button type="submit">Adicionar</button>
   </form>
 </section>
@@ -16,7 +21,8 @@
     <h2>{{ nomes_status[status] }} <span class="contador">{{ tarefas|length }}</span></h2>
 
     {% for tarefa in tarefas %}
-    <article class="cartao">
+    <article class="cartao prioridade-{{ tarefa.prioridade }}">
+      <span class="etiqueta etiqueta-{{ tarefa.prioridade }}">{{ nomes_prioridade[tarefa.prioridade] }}</span>
       <h3>{{ tarefa.titulo }}</h3>
       {% if tarefa.descricao %}<p>{{ tarefa.descricao }}</p>{% endif %}
 

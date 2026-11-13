@@ -7,7 +7,7 @@ depois, redireciona de volta para o quadro (padrão Post/Redirect/Get).
 from flask import (Blueprint, abort, current_app, flash, redirect, render_template,
                    request, url_for)
 
-from .modelo import NOMES_STATUS, STATUS_VALIDOS, ErroValidacao, Tarefa
+from .modelo import NOMES_PRIORIDADE, NOMES_STATUS, STATUS_VALIDOS, ErroValidacao, Tarefa
 
 web_bp = Blueprint("web", __name__)
 
@@ -20,7 +20,8 @@ def _repositorio():
 def quadro():
     """Página inicial: mostra as tarefas agrupadas nas três colunas do Kanban."""
     colunas = {status: _repositorio().listar(status=status) for status in STATUS_VALIDOS}
-    return render_template("quadro.html", colunas=colunas, nomes_status=NOMES_STATUS)
+    return render_template("quadro.html", colunas=colunas, nomes_status=NOMES_STATUS,
+                           nomes_prioridade=NOMES_PRIORIDADE)
 
 
 @web_bp.post("/tarefas")
@@ -30,6 +31,7 @@ def criar():
             Tarefa(
                 titulo=request.form.get("titulo", ""),
                 descricao=request.form.get("descricao", ""),
+                prioridade=request.form.get("prioridade", "media"),
             )
         )
         flash("Tarefa criada!", "sucesso")
@@ -61,12 +63,14 @@ def editar(tarefa_id: int):
                 titulo=request.form.get("titulo", ""),
                 descricao=request.form.get("descricao", ""),
                 status=request.form.get("status", tarefa.status),
+                prioridade=request.form.get("prioridade", tarefa.prioridade),
             )
             flash("Tarefa atualizada!", "sucesso")
             return redirect(url_for("web.quadro"))
         except ErroValidacao as erro:
             flash(str(erro), "erro")
-    return render_template("editar.html", tarefa=tarefa, nomes_status=NOMES_STATUS)
+    return render_template("editar.html", tarefa=tarefa, nomes_status=NOMES_STATUS,
+                           nomes_prioridade=NOMES_PRIORIDADE)
 
 
 @web_bp.post("/tarefas/<int:tarefa_id>/excluir")

@@ -19,6 +19,13 @@
         {% endfor %}
       </select>
     </label>
+    <label>Prioridade
+      <select name="prioridade">
+        {% for valor, nome in nomes_prioridade.items() %}
+        <option value="{{ valor }}" {% if valor == tarefa.prioridade %}selected{% endif %}>{{ nome }}</option>
+        {% endfor %}
+      </select>
+    </label>
     <div class="acoes">
       <button type="submit">Salvar</button>
       <a href="{{ url_for('web.quadro') }}">Cancelar</a>

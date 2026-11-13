@@ -17,6 +17,16 @@ NOMES_STATUS = {
     "concluido": "Concluído",
 }
 
+# MUDANÇA DE ESCOPO (v0.2): níveis de prioridade, do mais urgente ao menos urgente.
+PRIORIDADES = ("critica", "alta", "media", "baixa")
+
+NOMES_PRIORIDADE = {
+    "critica": "Crítica",
+    "alta": "Alta",
+    "media": "Média",
+    "baixa": "Baixa",
+}
+
 TITULO_MAX = 100
 DESCRICAO_MAX = 500
 
@@ -41,6 +51,7 @@ class Tarefa:
     titulo: str
     descricao: str = ""
     status: str = "a_fazer"
+    prioridade: str = "media"
     id: int | None = None
     criada_em: str = field(default_factory=_agora)
 
@@ -65,6 +76,11 @@ class Tarefa:
         if self.status not in STATUS_VALIDOS:
             raise ErroValidacao(
                 f"Status inválido: '{self.status}'. Use um destes: {', '.join(STATUS_VALIDOS)}."
+            )
+        if self.prioridade not in PRIORIDADES:
+            raise ErroValidacao(
+                f"Prioridade inválida: '{self.prioridade}'. "
+                f"Use uma destas: {', '.join(PRIORIDADES)}."
             )
 
     def para_dict(self) -> dict:

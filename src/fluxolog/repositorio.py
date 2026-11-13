@@ -11,7 +11,13 @@ from dataclasses import replace
 from .modelo import Tarefa
 
 # Campos que o usuário pode alterar em uma tarefa já existente.
-CAMPOS_EDITAVEIS = ("titulo", "descricao", "status")
+CAMPOS_EDITAVEIS = ("titulo", "descricao", "status", "prioridade")
+
+# Ordena do mais urgente para o menos urgente; empates ficam na ordem de criação.
+ORDEM_PRIORIDADE = (
+    "CASE prioridade WHEN 'critica' THEN 0 WHEN 'alta' THEN 1 "
+    "WHEN 'media' THEN 2 ELSE 3 END, id"
+)
 
 
 class RepositorioTarefas:
@@ -20,6 +26,7 @@ class RepositorioTarefas:
     def __init__(self, caminho_banco: str) -> None:
         self.caminho_banco = caminho_banco
         self._criar_tabela()
+        self._migrar()
 
     # ------------------------------------------------------------------ #
     # Funções internas
@@ -45,6 +52,19 @@ class RepositorioTarefas:
                 """
             )
 
+    def _migrar(self) -> None:
+        """MUDANÇA DE ESCOPO (v0.2): adiciona a coluna `prioridade` em bancos antigos.
+
+        Quem já usava a versão 0.1 tem um banco sem essa coluna. Em vez de apagar
+        os dados, a coluna é criada e as tarefas existentes recebem prioridade "media".
+        """
+        with closing(self._conectar()) as conexao, conexao:
+            colunas = [linha["name"] for linha in conexao.execute("PRAGMA table_info(tarefas)")]
+            if "prioridade" not in colunas:
+                conexao.execute(
+                    "ALTER TABLE tarefas ADD COLUMN prioridade TEXT NOT NULL DEFAULT 'media'"
+                )
+
     @staticmethod
     def _linha_para_tarefa(linha: sqlite3.Row) -> Tarefa:
         """Converte uma linha do banco em um objeto Tarefa."""
@@ -57,20 +77,31 @@ class RepositorioTarefas:
         """CREATE: salva uma nova tarefa e devolve ela já com o id gerado."""
         with closing(self._conectar()) as conexao, conexao:
             cursor = conexao.execute(
-                "INSERT INTO tarefas (titulo, descricao, status, criada_em) "
-                "VALUES (?, ?, ?, ?)",
-                (tarefa.titulo, tarefa.descricao, tarefa.status, tarefa.criada_em),
+                "INSERT INTO tarefas (titulo, descricao, status, prioridade, criada_em) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (tarefa.titulo, tarefa.descricao, tarefa.status, tarefa.prioridade,
+                 tarefa.criada_em),
             )
         return replace(tarefa, id=cursor.lastrowid)
 
-    def listar(self, status: str | None = None) -> list[Tarefa]:
-        """READ: lista as tarefas (opcionalmente só as de um status), mais antigas primeiro."""
-        sql = "SELECT * FROM tarefas"
-        parametros: tuple = ()
+    def listar(self, status: str | None = None,
+               prioridade: str | None = None) -> list[Tarefa]:
+        """READ: lista as tarefas, das mais urgentes para as menos urgentes.
+
+        Os filtros `status` e `prioridade` são opcionais e podem ser combinados.
+        """
+        filtros = []
+        parametros: list = []
         if status:
-            sql += " WHERE status = ?"
-            parametros = (status,)
-        sql += " ORDER BY id"
+            filtros.append("status = ?")
+            parametros.append(status)
+        if prioridade:
+            filtros.append("prioridade = ?")
+            parametros.append(prioridade)
+        sql = "SELECT * FROM tarefas"
+        if filtros:
+            sql += " WHERE " + " AND ".join(filtros)
+        sql += " ORDER BY " + ORDEM_PRIORIDADE
         with closing(self._conectar()) as conexao:
             linhas = conexao.execute(sql, parametros).fetchall()
         return [self._linha_para_tarefa(linha) for linha in linhas]
@@ -96,8 +127,9 @@ class RepositorioTarefas:
         nova = replace(atual, **alteracoes)
         with closing(self._conectar()) as conexao, conexao:
             conexao.execute(
-                "UPDATE tarefas SET titulo = ?, descricao = ?, status = ? WHERE id = ?",
-                (nova.titulo, nova.descricao, nova.status, tarefa_id),
+                "UPDATE tarefas SET titulo = ?, descricao = ?, status = ?, prioridade = ? "
+                "WHERE id = ?",
+                (nova.titulo, nova.descricao, nova.status, nova.prioridade, tarefa_id),
             )
         return nova
 
