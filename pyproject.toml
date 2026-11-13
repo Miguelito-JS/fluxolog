@@ -1,0 +1,10 @@
+[project]
+name = "fluxolog"
+version = "0.1.0"
+description = "Sistema web de gerenciamento de tarefas ágil para uma startup de logística"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+# Permite que os testes importem o pacote que fica dentro de /src
+pythonpath = ["src"]
+testpaths = ["tests"]
