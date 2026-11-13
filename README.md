@@ -22,6 +22,9 @@ uma está (**A Fazer → Em Progresso → Concluído**) e acompanhar o andamento
 
 **Fora do escopo:** login de usuários, notificações e relatórios.
 
+> A versão 0.2 ampliou este escopo com a **prioridade das tarefas**. Veja a seção
+> [Gestão de mudanças](#gestão-de-mudanças-mudança-de-escopo-v02).
+
 ## Metodologia
 
 O projeto segue um modelo **híbrido Scrum + Kanban**:
@@ -101,10 +104,60 @@ Os mesmos comandos rodam automaticamente no **GitHub Actions** a cada `push` (ab
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/api/tarefas` | Lista tarefas (filtro opcional `?status=a_fazer`) |
-| POST | `/api/tarefas` | Cria tarefa — corpo: `{"titulo": "...", "descricao": "..."}` |
+| GET | `/api/tarefas` | Lista tarefas, mais urgentes primeiro (filtros opcionais `?status=a_fazer&prioridade=critica`) |
+| POST | `/api/tarefas` | Cria tarefa — corpo: `{"titulo": "...", "descricao": "...", "prioridade": "alta"}` |
 | GET | `/api/tarefas/<id>` | Busca uma tarefa |
-| PUT | `/api/tarefas/<id>` | Atualiza título, descrição ou status |
+| PUT | `/api/tarefas/<id>` | Atualiza título, descrição, status ou prioridade |
 | DELETE | `/api/tarefas/<id>` | Remove uma tarefa |
 
 Dados inválidos retornam **400** com `{"erro": "mensagem"}`; tarefa inexistente retorna **404**.
+
+Valores aceitos — `status`: `a_fazer`, `em_progresso`, `concluido` ·
+`prioridade`: `critica`, `alta`, `media` (padrão), `baixa`.
+
+## Gestão de mudanças (mudança de escopo v0.2)
+
+### O que mudou
+
+As tarefas passaram a ter **prioridade** (Crítica, Alta, Média, Baixa). O quadro mostra as
+tarefas da mais urgente para a menos urgente, os cartões críticos têm destaque vermelho e a
+API ganhou o filtro `?prioridade=`.
+
+### Por que mudou (justificativa)
+
+Depois de validar a versão 0.1, o cliente relatou que **ocorrências urgentes** — como um
+veículo quebrado no meio da rota ou uma carga com prazo de entrega no mesmo dia — ficavam
+misturadas com tarefas de rotina. Como a lista era ordenada só pela data de criação, uma
+tarefa crítica criada depois ficava no fim da coluna e podia passar despercebida, gerando
+atrasos nas entregas.
+
+O próprio enunciado do cliente já pedia para **"priorizar tarefas críticas"**, e essa
+necessidade não estava no escopo inicial. A mudança foi aceita porque:
+
+- tem **alto valor** para o negócio (reduz atrasos em entregas);
+- tem **baixo custo**: um campo novo no modelo, sem alterar a arquitetura;
+- **não quebra** quem já usa o sistema (veja "Riscos" abaixo).
+
+### Como a mudança foi gerenciada
+
+1. **Registro:** criado o card *"Mudança de escopo: prioridade das tarefas"* na coluna
+   *To Do* do Kanban, com a justificativa acima.
+2. **Análise de impacto:** afeta modelo, banco de dados, API, interface e testes.
+3. **Implementação:** commit `feat(prioridade): ...` com a nova funcionalidade.
+4. **Controle de qualidade:** o GitHub Actions **falhou** logo após a implementação,
+   porque um teste antigo não conhecia o campo novo. O problema foi corrigido no commit
+   `test(prioridade): ...`, junto com 9 testes novos para a funcionalidade.
+5. **Documentação:** atualização deste README e do documento teórico.
+6. **Encerramento:** card movido para *Done*.
+
+### Riscos e como foram tratados
+
+| Risco | Tratamento |
+|---|---|
+| Bancos da v0.1 não têm a coluna `prioridade` | Migração automática (`_migrar()` em `repositorio.py`): a coluna é criada e as tarefas antigas recebem prioridade `media` |
+| Clientes da API que não enviam prioridade | Campo opcional, com valor padrão `media` |
+| Quebrar funcionalidades existentes | Toda a suíte de testes roda no CI antes de considerar a mudança concluída |
+
+## Autor
+
+**Lucas Saraiva Oliveira** — Análise e Desenvolvimento de Sistemas, UniFECAF.
