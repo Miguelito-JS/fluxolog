@@ -32,4 +32,79 @@ O projeto segue um modelo **híbrido Scrum + Kanban**:
   funcional (modelo, banco, API, interface, CI).
 - **Commits semânticos** (`feat`, `fix`, `test`, `docs`, `ci`, `chore`) para manter o histórico legível.
 
-_(As instruções de execução serão adicionadas assim que o código base estiver pronto.)_
+## Tecnologias
+
+| Camada | Ferramenta |
+|---|---|
+| Linguagem | Python 3.11+ |
+| Framework web | Flask |
+| Banco de dados | SQLite (arquivo `fluxolog.db`, criado automaticamente) |
+| Testes | pytest + pytest-cov |
+| Qualidade de código | flake8 |
+| Integração contínua | GitHub Actions |
+
+## Estrutura do repositório
+
+```
+fluxolog/
+├── .github/workflows/ci.yml   # pipeline de CI (flake8 + pytest)
+├── docs/                      # documentação e diagramas UML
+├── src/
+│   ├── app.py                 # ponto de entrada (roda o servidor)
+│   └── fluxolog/
+│       ├── __init__.py        # criar_app(): monta o app Flask
+│       ├── modelo.py          # classe Tarefa e validação de entradas
+│       ├── repositorio.py     # CRUD no banco SQLite
+│       ├── api.py             # API REST (JSON)
+│       ├── web.py             # páginas HTML (quadro Kanban)
+│       ├── templates/         # HTML (Jinja)
+│       └── static/            # CSS
+└── tests/                     # testes automatizados (pytest)
+```
+
+## Como executar
+
+Pré-requisito: [Python 3.11 ou mais novo](https://www.python.org/downloads/).
+
+```bash
+# 1. Clonar o repositório
+git clone https://github.com/SEU-USUARIO/fluxolog.git
+cd fluxolog
+
+# 2. Criar e ativar um ambiente virtual
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/macOS:
+source .venv/bin/activate
+
+# 3. Instalar as dependências
+pip install -r requirements-dev.txt
+
+# 4. Rodar o sistema
+python src/app.py
+```
+
+Abra **http://127.0.0.1:5000** no navegador.
+
+## Como rodar os testes e a verificação de qualidade
+
+```bash
+pytest -v                      # testes automatizados
+pytest --cov=fluxolog          # testes + cobertura de código
+flake8 src tests               # padrão de código (PEP 8)
+```
+
+Os mesmos comandos rodam automaticamente no **GitHub Actions** a cada `push` (aba *Actions*).
+
+## API REST
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/api/tarefas` | Lista tarefas (filtro opcional `?status=a_fazer`) |
+| POST | `/api/tarefas` | Cria tarefa — corpo: `{"titulo": "...", "descricao": "..."}` |
+| GET | `/api/tarefas/<id>` | Busca uma tarefa |
+| PUT | `/api/tarefas/<id>` | Atualiza título, descrição ou status |
+| DELETE | `/api/tarefas/<id>` | Remove uma tarefa |
+
+Dados inválidos retornam **400** com `{"erro": "mensagem"}`; tarefa inexistente retorna **404**.
